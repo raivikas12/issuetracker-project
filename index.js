@@ -1,16 +1,29 @@
-'use strict'
+require('dotenv').config();  //Load Env
+const express = require('express');
 
-// user require with a reference to bundle the file and use it in this file
-// var example = require('./example');
+const db = require('./config/mongoose');
+const port = process.env.PORT || 8000;
+const app = express();
+const path = require('path');
+const expressLayouts = require('express-ejs-layouts');
 
-import 'bootstrap'
+app.use(express.urlencoded());
+app.use(express.static('assets'));
+app.use(expressLayouts);
 
-// allows usage of new JS features
-require('babel-polyfill')
+// extract style and scripts from sub pages into the layout
+app.set('layout extractStyles', true);
+app.set('layout extractScripts', true);
 
-// load manifests
-// scripts
-require('./assets/scripts/app.js')
+// set up the view engine
+app.set('view engine', 'ejs');
+app.set('views', './views');
 
-// styles
-require('./assets/styles/index.scss')
+// use express router
+app.use('/', require('./routes'));
+app.listen(port, function (err) {
+  if (err) {
+    console.log(`Error in running the server: ${err}`);
+  }
+  console.log(`Server is running on port: ${port}`);
+});
